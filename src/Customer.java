@@ -23,6 +23,9 @@ public class Customer extends User {
     public int getCardNumber() {
         return cardNumber;
     }
+    public int getPin() {
+        return pin;
+    }
 
     public int getTries(){
         return tries;

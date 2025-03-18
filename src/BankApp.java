@@ -12,6 +12,7 @@ public class BankApp {
     }
 
     public static void mainMenu() {
+        customers = new ArrayList<>(UserDatabase.loadUsers()); // Load users
         System.out.println("----- Welcome to iBank -----");
         System.out.println("1. Login");
         System.out.println("2. Register");
@@ -90,54 +91,33 @@ public class BankApp {
     public static void register() {
         System.out.print("Enter your name: ");
         String name = input.next();
-        if (name.isEmpty()) {
-            System.out.println("Invalid name. Name must be at least 1 character.\n");
-            register();
-            return;
-        }
 
         System.out.print("Enter your username: ");
         String username = input.next();
-        if (username.length() < 3 || username.length() > 12 || !username.matches("[A-Za-z0-9]+")) {
-            System.out.println("Invalid username. Username must be 3-12 alphanumeric characters.\n");
-            register();
-            return;
-        }
 
         System.out.print("Enter your password: ");
         String password = input.next();
-        if (password.length() < 5) {
-            System.out.println("Invalid password. Password must be at least 5 characters.\n");
-            register();
-            return;
-        }
-
-        String hashedPassword = Authentication.hashPassword(password);
 
         System.out.print("Enter your pin: ");
         String pin = input.next();
-        if (pin.length() != 6 || !pin.matches("[0-9]+")) {
-            System.out.println("Invalid pin. Pin must be 6 digits.\n");
-            register();
-            return;
-        }
 
         for (Customer customer : customers) {
             if (customer.getUsername().equals(username)) {
-                System.out.println("Username is already taken. Please try again.\n");
-                register();
+                System.out.println("Username is already taken. Please try again.");
                 return;
             }
         }
 
-        Customer newCustomer = new Customer(name, username, hashedPassword, Integer.parseInt(pin));
+        Customer newCustomer = new Customer(name, username, Authentication.hashPassword(password), Integer.parseInt(pin));
         customers.add(newCustomer);
-        System.out.println("Registration successful!\n");
+        UserDatabase.saveUsers(customers); // Save after registration
+        System.out.println("Registration successful!");
         mainMenu();
     }
 
     public static void exitApp() {
-        System.out.println("See you later alligator!");
+        UserDatabase.saveUsers(customers); // Save before exit
+        System.out.println("See you later!");
         input.close();
     }
 }
