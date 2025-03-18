@@ -2,6 +2,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Customer extends User {
@@ -63,7 +64,9 @@ public class Customer extends User {
     public void addTransaction(String description) {
         Transaction transaction = new Transaction(description);
         transactionHistory.add(transaction);
+        TransactionDatabase.saveTransaction(this.getUsername(), transaction);
     }
+
 
     public void deposit(double amount) {
         if (amount <= 0) {
@@ -210,10 +213,17 @@ public class Customer extends User {
     }
 
     public void showTransactionHistory() {
+        List<Transaction> history = TransactionDatabase.loadTransactions().getOrDefault(this.getUsername(), new ArrayList<>());
+
         System.out.println("Transaction history: ");
-        for (Transaction transaction : this.transactionHistory) {
-            System.out.println(transaction.getDescription());
+        if (history.isEmpty()) {
+            System.out.println("No transactions found.");
+        } else {
+            for (Transaction transaction : history) {
+                System.out.println(transaction.getDescription());
+            }
         }
         System.out.println("*****************************\n");
     }
+
 }
