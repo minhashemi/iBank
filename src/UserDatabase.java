@@ -6,19 +6,36 @@ import json.*;
 public class UserDatabase {
     private static final String FILE_PATH = "users.json";
 
+    public static void updateUserBalance(String username, double newBalance) {
+        List<Customer> customers = loadUsers();  // Load all users
+
+        for (Customer customer : customers) {
+            if (customer.getUsername().equals(username)) {
+                customer.setBalance(newBalance); // Update balance
+                break;
+            }
+        }
+
+        saveUsers(customers);  // Save updated user list to JSON
+    }
+
+
     public static void saveUsers(List<Customer> newCustomers) {
         List<Customer> existingCustomers = loadUsers();  // Load existing users
 
-        // Merge new users into existing list (avoid duplicates)
+        // ✅ Update existing users with new data
         for (Customer newCustomer : newCustomers) {
-            boolean exists = false;
+            boolean updated = false;
             for (Customer existingCustomer : existingCustomers) {
                 if (existingCustomer.getUsername().equals(newCustomer.getUsername())) {
-                    exists = true;
+                    // ✅ Replace existing customer with updated data
+                    existingCustomer.setBalance(newCustomer.getBalance());
+                    updated = true;
                     break;
                 }
             }
-            if (!exists) {
+            // If user was not found in existing list, add as a new user
+            if (!updated) {
                 existingCustomers.add(newCustomer);
             }
         }
@@ -36,13 +53,14 @@ public class UserDatabase {
             jsonArray.add(new JSONValue(jsonObj));
         }
 
-        // Write updated user list to file
         try (FileWriter file = new FileWriter(FILE_PATH)) {
             file.write(jsonArray.toString());
+//            System.out.println("[DEBUG] User data saved successfully!");  // Debug log
         } catch (IOException e) {
             System.out.println("Error saving users: " + e.getMessage());
         }
     }
+
     public static List<Customer> loadUsers() {
         List<Customer> customers = new ArrayList<>();
         File file = new File(FILE_PATH);

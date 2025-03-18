@@ -63,43 +63,51 @@ public class CustomerMenu {
     }
 
     public static void deposit() {
-        if (BankApp.currentCustomer.getSuspended()) {
-            System.out.println("Your account has suspended, please contact administrator!\n");
-            BankApp.mainMenu();
+        System.out.print("Enter the amount to deposit: ");
+        double amount = input.nextDouble();
+
+        if (amount <= 0) {
+            System.out.println("Invalid amount. Please try again.\n");
             return;
         }
 
-        System.out.print("Enter the amount to deposit: ");
-        double amount = input.nextDouble();
         BankApp.currentCustomer.deposit(amount);
+        UserDatabase.updateUserBalance(BankApp.currentCustomer.getUsername(), BankApp.currentCustomer.getBalance());
+
         customerMenu();
     }
 
+
+
     public static void withdrawal() {
         if (BankApp.currentCustomer.getSuspended()) {
-            System.out.println("Your account has suspended, please contact administrator!\n");
+            System.out.println("Your account has been suspended, please contact the administrator!\n");
             BankApp.mainMenu();
             return;
         }
 
         System.out.print("Enter the amount to withdraw: ");
         double amount = input.nextDouble();
-        BankApp.currentCustomer.withdrawal(amount);
-        customerMenu();
-    }
 
-    public static void transfer(ArrayList<Customer> customers) {
-        if (BankApp.currentCustomer.getSuspended()) {
-            System.out.println("Your account has suspended, please contact administrator!\n");
-            BankApp.mainMenu();
+        if (amount > BankApp.currentCustomer.getBalance()) {
+            System.out.println("Insufficient funds. Your balance is: " + BankApp.currentCustomer.getBalance());
             return;
         }
 
+        BankApp.currentCustomer.withdrawal(amount);
+        UserDatabase.updateUserBalance(BankApp.currentCustomer.getUsername(), BankApp.currentCustomer.getBalance());
+
+        customerMenu();
+    }
+
+
+    public static void transfer(ArrayList<Customer> customers) {
         System.out.print("Enter the card number to transfer to: ");
         int cardNumber = input.nextInt();
         System.out.print("Enter the amount to transfer: ");
         double amount = input.nextDouble();
 
+        // Find receiver
         Customer receiver = null;
         for (Customer customer : customers) {
             if (customer.getCardNumber() == cardNumber) {
@@ -114,9 +122,19 @@ public class CustomerMenu {
             return;
         }
 
+        // enough balance?
+        if (amount > BankApp.currentCustomer.getBalance()) {
+            System.out.println("Insufficient funds. Your balance is: " + BankApp.currentCustomer.getBalance());
+            return;
+        }
+
         BankApp.currentCustomer.transfer(receiver, amount);
+        UserDatabase.updateUserBalance(BankApp.currentCustomer.getUsername(), BankApp.currentCustomer.getBalance());
+        UserDatabase.updateUserBalance(receiver.getUsername(), receiver.getBalance());
+
         customerMenu();
     }
+
 
     public static void transactionHistory() {
         if (BankApp.currentCustomer.getSuspended()) {

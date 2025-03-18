@@ -18,7 +18,7 @@ public class Customer extends User {
         super(name, username, password, "Customer");
         this.cardNumber = (int) (Math.random() * 9_999_999);
         this.pin = pin;
-        this.balance = 0.0;
+        setBalance(0.0);
         this.suspended = false;
     }
 
@@ -27,7 +27,7 @@ public class Customer extends User {
         super(name, username, password, "Customer");
         this.cardNumber = cardNumber;
         this.pin = pin;
-        this.balance = balance;
+        setBalance(balance);
         this.suspended = false;
     }
 
@@ -47,6 +47,9 @@ public class Customer extends User {
     }
     public double getBalance(){
         return balance;
+    }
+    public void setBalance(double balance){
+        this.balance = balance;
     }
 
     @Override
