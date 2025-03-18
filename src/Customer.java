@@ -13,11 +13,21 @@ public class Customer extends User {
     private boolean suspended;
     private int tries;
 
+    // register
     public Customer(String name, String username, String password, int pin) {
         super(name, username, password, "Customer");
         this.cardNumber = (int) (Math.random() * 9_999_999);
         this.pin = pin;
         this.balance = 0.0;
+        this.suspended = false;
+    }
+
+    // login
+    public Customer(String name, String username, String password, int pin, double balance, int cardNumber) {
+        super(name, username, password, "Customer");
+        this.cardNumber = cardNumber;
+        this.pin = pin;
+        this.balance = balance;
         this.suspended = false;
     }
 
@@ -34,6 +44,9 @@ public class Customer extends User {
 
     public boolean getSuspended(){
         return suspended;
+    }
+    public double getBalance(){
+        return balance;
     }
 
     @Override

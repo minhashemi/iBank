@@ -31,7 +31,8 @@ public class UserDatabase {
             jsonObj.put("username", new JSONValue(customer.getUsername()));
             jsonObj.put("password", new JSONValue(customer.getPassword()));
             jsonObj.put("pin", new JSONValue((long) customer.getPin()));
-            jsonObj.put("suspended", new JSONValue(customer.getSuspended()));
+            jsonObj.put("card", new JSONValue((long) customer.getCardNumber()));
+            jsonObj.put("balance", new JSONValue(customer.getBalance()));
             jsonArray.add(new JSONValue(jsonObj));
         }
 
@@ -63,10 +64,11 @@ public class UserDatabase {
                         JSONValue usernameValue = jsonObj.get("username");
                         JSONValue passwordValue = jsonObj.get("password");
                         JSONValue pinValue = jsonObj.get("pin");
-                        JSONValue suspendedValue = jsonObj.get("suspended");
+                        JSONValue cardValue = jsonObj.get("card");
+                        JSONValue balanceValue = jsonObj.get("balance");
 
                         if (nameValue == null || usernameValue == null || passwordValue == null ||
-                                pinValue == null || suspendedValue == null) {
+                                pinValue == null) {
                             continue; // Skip invalid entries
                         }
 
@@ -74,9 +76,10 @@ public class UserDatabase {
                         String username = usernameValue.getValue().toString();
                         String password = passwordValue.getValue().toString();
                         int pin = Integer.parseInt(pinValue.getValue().toString());
-                        boolean suspended = Boolean.parseBoolean(suspendedValue.getValue().toString());
+                        int card = Integer.parseInt(cardValue.getValue().toString());
+                        double balance = Double.parseDouble(balanceValue.getValue().toString());
 
-                        customers.add(new Customer(name, username, password, pin));
+                        customers.add(new Customer(name, username, password, pin, balance, card));
                     }
                 }
             }
