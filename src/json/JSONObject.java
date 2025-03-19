@@ -6,17 +6,17 @@ import java.util.Map;
 public class JSONObject {
     private final Map<String, JSONValue> map = new LinkedHashMap<>();
 
-    // Add key-value pair
+    // Add KV
     public void put(String key, JSONValue value) {
         map.put(key, value);
     }
 
-    // Get value by key (returns JSONValue or null)
+    // get V from K
     public JSONValue get(String key) {
         return map.getOrDefault(key, null);
     }
 
-    // Get number of key-value pairs
+    // KV cnt
     public int size() {
         return map.size();
     }

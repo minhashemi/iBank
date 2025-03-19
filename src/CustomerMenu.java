@@ -6,13 +6,13 @@ public class CustomerMenu {
     static Scanner input = new Scanner(System.in);
 
     public static void customerMenu() {
-        if (BankApp.currentCustomer.getSuspended()) {
+        if (App.currentCustomer.getSuspended()) {
             System.out.println("Your account has suspended, please contact administrator!\n");
-            BankApp.mainMenu();
+            App.mainMenu();
             return;
         }
 
-        System.out.println("**** Welcome, " + BankApp.currentCustomer.getName() + "! ****");
+        System.out.println("**** Welcome, " + App.currentCustomer.getName() + "! ****");
         System.out.println("1. Deposit");
         System.out.println("2. Withdrawal");
         System.out.println("3. Transfer");
@@ -45,7 +45,7 @@ public class CustomerMenu {
                 withdrawal();
                 break;
             case 3:
-                transfer(BankApp.customers);
+                transfer(App.customers);
                 break;
             case 4:
                 transactionHistory();
@@ -57,7 +57,7 @@ public class CustomerMenu {
                 logOut();
                 break;
             case 7:
-                BankApp.exitApp();
+                App.exitApp();
                 break;
         }
     }
@@ -71,8 +71,8 @@ public class CustomerMenu {
             return;
         }
 
-        BankApp.currentCustomer.deposit(amount);
-        UserDatabase.updateUserBalance(BankApp.currentCustomer.getUsername(), BankApp.currentCustomer.getBalance());
+        App.currentCustomer.deposit(amount);
+        UserDatabase.updateUserBalance(App.currentCustomer.getUsername(), App.currentCustomer.getBalance());
 
         customerMenu();
     }
@@ -80,22 +80,22 @@ public class CustomerMenu {
 
 
     public static void withdrawal() {
-        if (BankApp.currentCustomer.getSuspended()) {
+        if (App.currentCustomer.getSuspended()) {
             System.out.println("Your account has been suspended, please contact the administrator!\n");
-            BankApp.mainMenu();
+            App.mainMenu();
             return;
         }
 
         System.out.print("Enter the amount to withdraw: ");
         double amount = input.nextDouble();
 
-        if (amount > BankApp.currentCustomer.getBalance()) {
-            System.out.println("Insufficient funds. Your balance is: " + BankApp.currentCustomer.getBalance());
+        if (amount > App.currentCustomer.getBalance()) {
+            System.out.println("Insufficient funds. Your balance is: " + App.currentCustomer.getBalance());
             return;
         }
 
-        BankApp.currentCustomer.withdrawal(amount);
-        UserDatabase.updateUserBalance(BankApp.currentCustomer.getUsername(), BankApp.currentCustomer.getBalance());
+        App.currentCustomer.withdrawal(amount);
+        UserDatabase.updateUserBalance(App.currentCustomer.getUsername(), App.currentCustomer.getBalance());
 
         customerMenu();
     }
@@ -123,13 +123,13 @@ public class CustomerMenu {
         }
 
         // enough balance?
-        if (amount > BankApp.currentCustomer.getBalance()) {
-            System.out.println("Insufficient funds. Your balance is: " + BankApp.currentCustomer.getBalance());
+        if (amount > App.currentCustomer.getBalance()) {
+            System.out.println("Insufficient funds. Your balance is: " + App.currentCustomer.getBalance());
             return;
         }
 
-        BankApp.currentCustomer.transfer(receiver, amount);
-        UserDatabase.updateUserBalance(BankApp.currentCustomer.getUsername(), BankApp.currentCustomer.getBalance());
+        App.currentCustomer.transfer(receiver, amount);
+        UserDatabase.updateUserBalance(App.currentCustomer.getUsername(), App.currentCustomer.getBalance());
         UserDatabase.updateUserBalance(receiver.getUsername(), receiver.getBalance());
 
         customerMenu();
@@ -137,32 +137,20 @@ public class CustomerMenu {
 
 
     public static void transactionHistory() {
-        if (BankApp.currentCustomer.getSuspended()) {
-            System.out.println("Your account has suspended, please contact administrator!\n");
-            BankApp.mainMenu();
-            return;
-        }
-
-        BankApp.currentCustomer.showTransactionHistory();
+        App.currentCustomer.showTransactionHistory();
         customerMenu();
     }
 
     public static void accountInformation() {
-        if (BankApp.currentCustomer.getSuspended()) {
-            System.out.println("Your account has suspended, please contact administrator!\n");
-            BankApp.mainMenu();
-            return;
-        }
-
-        System.out.println("**** Account Information ****");
-        BankApp.currentCustomer.displayInfo();
-        System.out.println("*****************************\n");
+        System.out.println("---- Account Information ----");
+        App.currentCustomer.displayInfo();
+        System.out.println("-----------------------------\n");
         CustomerMenu.customerMenu();
     }
 
     public static void logOut() {
-        System.out.println("Goodbye, " + BankApp.currentCustomer.getName() + "! See you next time.\n");
-        BankApp.currentCustomer = null;
-        BankApp.mainMenu();
+        System.out.println("Have a nice day, " + App.currentCustomer.getName());
+        App.currentCustomer = null;
+        App.mainMenu();
     }
 }

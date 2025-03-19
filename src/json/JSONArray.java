@@ -14,9 +14,6 @@ public class JSONArray {
     }
 
     public JSONValue get(int index) {
-        if (index < 0 || index >= values.size()) {
-            throw new IndexOutOfBoundsException("Index out of range: " + index);
-        }
         return values.get(index);
     }
 

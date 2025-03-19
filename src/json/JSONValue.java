@@ -1,7 +1,5 @@
 package json;
 
-import java.util.Objects;
-
 public class JSONValue {
     private final Object value;
 
@@ -13,15 +11,10 @@ public class JSONValue {
         this.value = value;
     }
 
-    // Returns the stored value
     public Object getValue() {
         return value;
     }
 
-    // Type checking utility
-    public boolean isType(Class<?> type) {
-        return type.isInstance(value);
-    }
 
     @Override
     public String toString() {
@@ -30,7 +23,7 @@ public class JSONValue {
         return value.toString();
     }
 
-    // Escape quotes and backslashes in JSON strings
+    // esc quotes and backslashes
     private String escape(String s) {
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }

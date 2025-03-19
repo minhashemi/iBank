@@ -23,12 +23,11 @@ public class UserDatabase {
     public static void saveUsers(List<Customer> newCustomers) {
         List<Customer> existingCustomers = loadUsers();  // Load existing users
 
-        // ✅ Update existing users with new data
+        // update user with new data
         for (Customer newCustomer : newCustomers) {
             boolean updated = false;
             for (Customer existingCustomer : existingCustomers) {
                 if (existingCustomer.getUsername().equals(newCustomer.getUsername())) {
-                    // ✅ Replace existing customer with updated data
                     existingCustomer.setBalance(newCustomer.getBalance());
                     updated = true;
                     break;

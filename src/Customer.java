@@ -58,7 +58,6 @@ public class Customer extends User {
         System.out.println("Card Number: " + cardNumber);
         System.out.println("PIN: " + pin);
         System.out.println("Balance: " + balance);
-        System.out.println("IsSuspended: " + suspended);
     }
 
     public void addTries(){
@@ -73,9 +72,7 @@ public class Customer extends User {
         this.tries = 0;
     }
 
-    public void resetSuspended(){
-        this.suspended = false;
-    }
+
 
     public void addTransaction(String description) {
         Transaction transaction = new Transaction(description);
@@ -197,7 +194,7 @@ public class Customer extends User {
             while (enteredPin != this.pin) {
                 if (getTries() == 9) {
                     setSuspended();
-                    CustomerMenu.transfer(BankApp.customers);
+                    CustomerMenu.transfer(App.customers);
                 }
 
                 System.out.println("Invalid PIN. Please try again.\n");
@@ -209,24 +206,39 @@ public class Customer extends User {
         } catch (InputMismatchException e) {
             if (getTries() == 9) {
                 setSuspended();
-                CustomerMenu.transfer(BankApp.customers);
+                CustomerMenu.transfer(App.customers);
             }
 
             System.out.println("Invalid PIN. Please try again.\n");
             addTries();
-            CustomerMenu.transfer(BankApp.customers);
+            CustomerMenu.transfer(App.customers);
         }
+
 
         DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss yyyy/MM/dd");
         LocalDateTime now = LocalDateTime.now();
         this.balance -= amount;
         receiver.balance += amount;
 
-        addTransaction("(-) Transfer of " + amount + " to card number " + receiver.cardNumber + " at " + dtf.format(now));
-        receiver.addTransaction("(+) Received transfer of " + amount + " from card number " + this.cardNumber + " at " + dtf.format(now));
+        String senderTransaction = "(-) Transfer of " + amount + " to " + receiver.getUsername() +
+                " (Card: " + receiver.cardNumber + ") at " + dtf.format(now);
+        String receiverTransaction = "(+) Received transfer of " + amount + " from " + this.getUsername() +
+                " (Card: " + this.cardNumber + ") at " + dtf.format(now);
+
+        // transaction history
+        addTransaction(senderTransaction);
+        receiver.addTransaction(receiverTransaction);
+
+        // save
+        TransactionDatabase.saveTransaction(this.getUsername(), new Transaction(senderTransaction));
+        TransactionDatabase.saveTransaction(receiver.getUsername(), new Transaction(receiverTransaction));
+
         System.out.println("Transfer successful! Your new balance is " + this.balance + "\n");
         resetTries();
     }
+
+
+
 
     public void showTransactionHistory() {
         List<Transaction> history = TransactionDatabase.loadTransactions().getOrDefault(this.getUsername(), new ArrayList<>());
@@ -239,7 +251,7 @@ public class Customer extends User {
                 System.out.println(transaction.getDescription());
             }
         }
-        System.out.println("*****************************\n");
+        System.out.println("---------------------------------\n");
     }
 
 }

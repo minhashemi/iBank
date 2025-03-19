@@ -9,7 +9,7 @@ public class Authentication {
 
             StringBuilder sb = new StringBuilder();
             for (byte b : hash) {
-                sb.append(String.format("%02x", b));
+                sb.append(String.format("%02x", b)); // hex
             }
 
             return sb.toString();

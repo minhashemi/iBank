@@ -5,17 +5,18 @@ import json.*;
 public class TransactionDatabase {
     private static final String FILE_PATH = "history.json";
 
+    // Saves a transaction for a user
     public static void saveTransaction(String username, Transaction transaction) {
         Map<String, List<Transaction>> transactions = loadTransactions();
-
         transactions.putIfAbsent(username, new ArrayList<>());
         transactions.get(username).add(transaction);
-
         saveTransactions(transactions);
     }
 
+    // write history to file
     private static void saveTransactions(Map<String, List<Transaction>> transactions) {
         JSONArray jsonArray = new JSONArray();
+
         for (Map.Entry<String, List<Transaction>> entry : transactions.entrySet()) {
             JSONObject userTransactions = new JSONObject();
             userTransactions.put("username", new JSONValue(entry.getKey()));
@@ -31,17 +32,22 @@ public class TransactionDatabase {
             jsonArray.add(new JSONValue(userTransactions));
         }
 
-        try (FileWriter file = new FileWriter(FILE_PATH)) {
-            file.write(jsonArray.toString());
+        try (FileWriter file = new FileWriter(FILE_PATH, false);
+             BufferedWriter writer = new BufferedWriter(file)) {
+            writer.write(jsonArray.toString());
+            writer.flush();
         } catch (IOException e) {
             System.out.println("Error saving transactions: " + e.getMessage());
         }
     }
 
+    // Loads history from file
     public static Map<String, List<Transaction>> loadTransactions() {
         Map<String, List<Transaction>> transactions = new HashMap<>();
         File file = new File(FILE_PATH);
-        if (!file.exists()) return transactions;
+        if (!file.exists()) {
+            return transactions;
+        }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             StringBuilder jsonContent = new StringBuilder();
@@ -50,34 +56,40 @@ public class TransactionDatabase {
                 jsonContent.append(line);
             }
 
-            JSONValue parsedValue = JSONParser.parse(jsonContent.toString());
-            if (parsedValue.getValue() instanceof JSONArray jsonArray) {
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JSONValue value = jsonArray.get(i);
-                    if (value.getValue() instanceof JSONObject jsonObj) {
-                        JSONValue usernameValue = jsonObj.get("username");
-                        JSONValue transactionsValue = jsonObj.get("transactions");
+            JSONValue parsedValue;
+            try {
+                parsedValue = JSONParser.parse(jsonContent.toString());
+            } catch (Exception e) {
+                return transactions;
+            }
 
-                        if (usernameValue == null || transactionsValue == null) continue;
+            if (!(parsedValue.getValue() instanceof JSONArray jsonArray)) {
+                return transactions;
+            }
 
-                        String username = usernameValue.getValue().toString();
-                        List<Transaction> userTransactions = new ArrayList<>();
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONValue value = jsonArray.get(i);
+                if (!(value.getValue() instanceof JSONObject jsonObj)) continue;
 
-                        if (transactionsValue.getValue() instanceof JSONArray transArray) {
-                            for (int j = 0; j < transArray.size(); j++) {
-                                JSONValue transValue = transArray.get(j);
-                                if (transValue.getValue() instanceof JSONObject transObj) {
-                                    JSONValue descValue = transObj.get("description");
-                                    if (descValue != null) {
-                                        userTransactions.add(new Transaction(descValue.getValue().toString()));
-                                    }
-                                }
-                            }
+                JSONValue usernameValue = jsonObj.get("username");
+                JSONValue transactionsValue = jsonObj.get("transactions");
+                if (usernameValue == null || transactionsValue == null) continue;
+
+                String username = usernameValue.getValue().toString();
+                List<Transaction> userTransactions = new ArrayList<>();
+
+                if (transactionsValue.getValue() instanceof JSONArray transArray) {
+                    for (int j = 0; j < transArray.size(); j++) {
+                        JSONValue transValue = transArray.get(j);
+                        if (!(transValue.getValue() instanceof JSONObject transObj)) continue;
+
+                        JSONValue descValue = transObj.get("description");
+                        if (descValue != null) {
+                            userTransactions.add(new Transaction(descValue.getValue().toString()));
                         }
-
-                        transactions.put(username, userTransactions);
                     }
                 }
+                transactions.put(username, userTransactions);
             }
         } catch (IOException e) {
             System.out.println("Error loading transactions: " + e.getMessage());

@@ -2,12 +2,13 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class BankApp {
+public class App implements Runnable{
     static Scanner input = new Scanner(System.in);
     static Customer currentCustomer = null;
     static ArrayList<Customer> customers = new ArrayList<>();
 
-    public void start() {
+    @Override
+    public void run() {
         mainMenu();
     }
 
@@ -54,27 +55,7 @@ public class BankApp {
         String password = input.next();
 
         for (Customer customer : customers) {
-            if (customer.getUsername().equals(username) && !Authentication.hashPassword(password).equals(customer.getPassword())) {
-                if (customer.getSuspended()) {
-                    System.out.println("Your account has suspended, please contact administrator!\n");
-                    mainMenu();
-                }
-
-                if (customer.getTries() == 9) {
-                    customer.setSuspended();
-                }
-
-                System.out.println("Invalid username or password. Please try again.\n");
-                customer.addTries();
-                login();
-                return;
-            }
-
             if (customer.getUsername().equals(username) && Authentication.hashPassword(password).equals(customer.getPassword())) {
-                if (customer.getSuspended()) {
-                    System.out.println("Your account has suspended, please contact administrator!\n");
-                    mainMenu();
-                }
 
                 System.out.println("Login successful!\n");
                 currentCustomer = customer;
